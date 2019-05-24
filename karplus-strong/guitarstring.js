@@ -46,7 +46,18 @@ GuitarString.prototype.pluck = function(startTime, velocity, tab) {
     var sampleCount = 1.0 * sampleRate;
     var buffer = this.audioCtx.createBuffer(channels, sampleCount, sampleRate);
 
-    var options = getControlsValues();
+    var options = typeof getControlsValues === "function" ? getControlsValues() : {
+        body: "simple",
+        characterVariation: 0.5,
+        pluckDamping: 0.5,
+        pluckDampingVariation: 0.25,
+        stereoSpread: 0.2,
+        stringDamping: 0.5,
+        stringDampingCalculation: "magic",
+        stringDampingVariation: 0.25,
+        stringTension: 0
+    }
+
     var smoothingFactor = calculateSmoothingFactor(this, tab, options);
     // 'tab' represents which fret is held while plucking
     // each fret represents an increase in pitch by one semitone
@@ -86,3 +97,23 @@ GuitarString.prototype.pluck = function(startTime, velocity, tab) {
 
     bufferSource.start(startTime);
 };
+
+// calculate the constant used for the low-pass filter
+// used in the Karplus-Strong loop
+function calculateSmoothingFactor(string, tab, options) {
+    var smoothingFactor;
+    if (options.stringDampingCalculation == "direct") {
+        smoothingFactor = options.stringDamping;
+    } else if (options.stringDampingCalculation == "magic") {
+        // this is copied verbatim from the flash one
+        // is magical, don't know how it works
+        var noteNumber = (string.semitoneIndex + tab - 19)/44;
+        smoothingFactor =
+            options.stringDamping +
+            Math.pow(noteNumber, 0.5) * (1 - options.stringDamping) * 0.5 +
+            (1 - options.stringDamping) *
+                Math.random() *
+                options.stringDampingVariation;
+    }
+    return smoothingFactor;
+}

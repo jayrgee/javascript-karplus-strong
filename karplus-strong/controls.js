@@ -62,26 +62,6 @@ function getControlsValues() {
     };
 }
 
-// calculate the constant used for the low-pass filter
-// used in the Karplus-Strong loop
-function calculateSmoothingFactor(string, tab, options) {
-    var smoothingFactor;
-    if (options.stringDampingCalculation == "direct") {
-        smoothingFactor = options.stringDamping;
-    } else if (options.stringDampingCalculation == "magic") {
-        // this is copied verbatim from the flash one
-        // is magical, don't know how it works
-        var noteNumber = (string.semitoneIndex + tab - 19)/44;
-        smoothingFactor =
-            options.stringDamping +
-            Math.pow(noteNumber, 0.5) * (1 - options.stringDamping) * 0.5 +
-            (1 - options.stringDamping) *
-                Math.random() *
-                options.stringDampingVariation;
-    }
-    return smoothingFactor;
-}
-
 function toggleGuitarPlaying(buttonID, mode) {
     var startStopButton = document.getElementById(buttonID);
     var text = startStopButton.innerHTML;
