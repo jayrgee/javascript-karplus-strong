@@ -38,12 +38,13 @@ function GuitarString(
 }
 
 
-GuitarString.prototype.pluck = function(startTime, velocity, tab) {
+GuitarString.prototype.pluck = function(startTime, velocity, tab, duration) {
     // create the buffer we're going to write into
     var channels = 2;
     var sampleRate = audioCtx.sampleRate;
-    // 1 second buffer
-    var sampleCount = 1.0 * sampleRate;
+    // default duration = 1 second buffer
+    duration = duration || 1.0;
+    var sampleCount = duration * sampleRate;
     var buffer = this.audioCtx.createBuffer(channels, sampleCount, sampleRate);
 
     var options = typeof getControlsValues === "function" ? getControlsValues() : {
